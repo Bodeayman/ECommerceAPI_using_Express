@@ -1,12 +1,16 @@
-const constants = require("../constants")
+const constants = require("../constants");
+
 const errorHandler = (err, req, res, next) => {
-    const status = res.statusCode ? res.statusCode : 500;
+    // Use error status code or default to 500
+    const status = err.statusCode ? err.statusCode : 500;
+
+    // Check the status code and handle accordingly
     switch (status) {
         case constants.VALIDATION_ERROR:
             res.status(status).json({ "title": "Validation Failed", "message": err.message, "stackTrace": err.stack });
             break;
         case constants.NOT_FOUND:
-            res.status(status).json({ "title": "Not found", "message": err.message, "stackTrace": err.stack });
+            res.status(status).json({ "title": "Not Found", "message": err.message, "stackTrace": err.stack });
             break;
         case constants.FORBIDDEN:
             res.status(status).json({ "title": "Forbidden Access", "message": err.message, "stackTrace": err.stack });
@@ -18,9 +22,9 @@ const errorHandler = (err, req, res, next) => {
             res.status(status).json({ "title": "Server Error", "message": err.message, "stackTrace": err.stack });
             break;
         default:
-            console.log("No error at all");
+            res.status(500).json({ "title": "Internal Server Error", "message": err.message, "stackTrace": err.stack });
             break;
     }
-}
+};
 
 module.exports = errorHandler;

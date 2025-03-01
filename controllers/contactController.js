@@ -13,7 +13,7 @@ const getContact = asyncHandler(async (req, res) => {
 });
 
 const getSingleContact = asyncHandler(async (req, res) => {
-    const contact = await Contact.findById(req.params.id);
+    const contact = await Contact.find({ user_id: req.user.id });
     if (!contact) {
         res.status(404);
         throw new Error("Contact not found");
@@ -28,7 +28,7 @@ const createContact = asyncHandler(async (req, res) => {
     const { name, email, phone } = req.body;
     if (!name || !email || !phone) {
         res.status(400);
-        throw new Error("All feild");
+        throw new Error("All field");
     }
     const newContact = await Contact.create({ name, email, phone });
     res.status(201).json({ "contact": newContact })

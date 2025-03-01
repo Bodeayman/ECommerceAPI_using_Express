@@ -1,8 +1,11 @@
 const express = require('express');
+const validateToken = require("../middleware/validateTokenHandler");
 const { getContact, createContact, putContact, deleteContact, getSingleContact } = require('../controllers/contactController')
 // You should define the brackets and the words inside the brackets 
 const router = express.Router();
 
+
+router.use(validateToken);
 router.route('/').get(getContact).post(createContact);
 
 router.route('/:id').put(putContact).delete(deleteContact).get(getSingleContact);
