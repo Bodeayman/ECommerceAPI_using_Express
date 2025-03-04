@@ -10,14 +10,14 @@ const pgConnection = require('../config/pgConnection');
 
 const getProduct = async (req, res) => {
     const client = pgConnection();
-    const results = await client.query(`SELECT * from products where id = $1`, [req.params.id]);
+    const results = await client.query(`SELECT name,price,descr from products where id = $1`, [req.params.id]);
     res.status(200).json({ "message": results.rows[0] });
 }
 
 const getAllProducts = async (req, res) => {
 
     const client = pgConnection();
-    const results = await client.query('SELECT * FROM products');
+    const results = await client.query('SELECT name,price,descr FROM products');
     res.status(200).json({ "message": results.rows });
 
 }
