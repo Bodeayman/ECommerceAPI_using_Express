@@ -4,33 +4,46 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const dotenv = require('dotenv').config();
-const pgConnection = require('../config/pgConnection');
-
+const prisma = require('../prisma/prismaClient');
 
 
 const getProduct = async (req, res) => {
-    const client = pgConnection();
-    const results = await client.query(`SELECT name,price,descr from products where id = $1`, [req.params.id]);
-    res.status(200).json({ "message": results.rows[0] });
+
+    const product = await prisma.product.findUnique({
+        where: {
+            id: parseInt(req.params.id),
+        }
+
+    });
+    console.log(product);
+    res.status(200).json({ "message": product });
 }
 
 const getAllProducts = async (req, res) => {
 
-    const client = pgConnection();
-    const results = await client.query('SELECT name,price,descr FROM products');
-    res.status(200).json({ "message": results.rows });
+    try {
+        const products = await prisma.product.findMany();
+        res.status(200).json({ "message": products });
+    }
+    catch (err) {
+        res.status(500).json({ "Error": err.message });
+    }
 
 }
 
 const createProduct = async (req, res) => {
-    const client = pgConnection();
-    let { id, name, price, descr } = req.body;
-    price = Number.parseInt(price);
-    id = Number.parseInt(id);
+    let { name, price, descr } = req.body;
+    price = parseInt(price);
 
     try {
-        await client.query(`insert into products (id,name,price,descr) values ($1,$2,$3,$4)`, [id, name, price, descr]);
-        res.status(200).json({ "message": "Inserted Successfully", "data": req.body });
+        const createdProduct = await prisma.product.create({
+            data: {
+                name: name,
+                descr: descr,
+                price: price,
+            }
+        });
+        res.status(201).json(createdProduct);
     }
     catch (err) {
         res.status(404).json({ "Error": err.message });
@@ -39,19 +52,15 @@ const createProduct = async (req, res) => {
 }
 
 const deleteProduct = async (req, res) => {
-    const client = await pgConnection();
-    let id = req.params.id;
+    let id = parseInt(req.params.id);
     try {
 
-        const result = await client.query('SELECT * FROM products WHERE id = $1', [id]);
-
-        if (result.rows.length === 0) {
-            return res.status(404).json({ "message": "The product is not found" });
-        }
-
-        await client.query('DELETE FROM products WHERE id = $1', [id]);
-
-        res.status(200).json({ "message": "Deleted Successfully" });
+        const deletedProduct = await prisma.product.delete({
+            where: {
+                id: id
+            }
+        });
+        res.status(200).json({ "message": "Deleted Successfully", "Product Deleted": deletedProduct });
     } catch (err) {
         console.error(err);
         res.status(500).json({ "Error": "Internal Server Error" });
@@ -59,22 +68,26 @@ const deleteProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-    const client = await pgConnection();
-    let { id, name, price, descr } = req.body;
+    let id = parseInt(req.params.id);
+    let { name, price, descr } = req.body;
     try {
 
-        const result = await client.query('SELECT * FROM products WHERE id = $1', [id]);
-
-        if (result.rows.length === 0) {
-            return res.status(404).json({ "message": "The product is not found" });
-        }
-
-        await client.query('DELETE FROM products WHERE id = $1', [id]);
-
-        res.status(200).json({ "message": "Deleted Successfully" });
+        const updatedProduct = await prisma.product.update({
+            where: {
+                id: id,
+            }
+            , data: {
+                price: price,
+                descr: descr,
+                name: name
+            }
+        });
+        res.status(200).json({ "Message": "Updated the Product", "Product": updatedProduct });
     } catch (err) {
         console.error(err);
         res.status(500).json({ "Error": "Internal Server Error" });
     }
 };
-module.exports = { getProduct, getAllProducts, createProduct, deleteProduct }
+
+
+module.exports = { getProduct, getAllProducts, createProduct, deleteProduct, updateProduct }
