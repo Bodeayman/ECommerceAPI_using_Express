@@ -21,8 +21,7 @@ model Product {
   name     String  @db.VarChar(255)
   price    Int
   descr    String  @db.VarChar(500)
-
-  @@map("products")  // Map the model to the exact table name in your database
+  image_url String @db.VarChar(500)
 }
 
 model User {
@@ -30,4 +29,15 @@ model User {
   name     String  @db.VarChar(255)
   password String @db.VarChar(255)
   email    String  @unique @db.VarChar(500)
+  address String @db.VarChar(255)
+}
+model Review{
+  id       Int     @id @default(autoincrement())
+  user_id_relation User @relation(fields: [user_id], references: [id])
+  product_id_relation Product @relation(fields: [product_id], references: [id])
+  user_id Int 
+  product_id Int
+  rating Decimal
+  comment String @db.VarChar(255)
+
 }

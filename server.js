@@ -1,19 +1,20 @@
 const express = require('express');
-const errorHandler = require('./middleware/errorhandler');
 const dotenv = require('dotenv').config();
-const bodyParse = require('body-parser');
-const connectDb = require('./config/dbConnection');
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./docs/swagger-output.json"); // Auto-generated
+const errorHandler = require('./middleware/errorhandler');
 const pgConnection = require('./config/pgConnection');
 
-// connectDb();
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
-app.use(bodyParse.json());
+app.use(express.json());
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/contacts', require("./routes/contactRoutes"));
 app.use('/api/users', require("./routes/userRoutes"));
 app.use('/api/products', require('./routes/productRoutes'));
 
 app.use(errorHandler);
 
-app.listen(PORT, () => console.log(`Kill yourself because the server works in ${PORT}`));
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
