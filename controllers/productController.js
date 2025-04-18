@@ -23,7 +23,7 @@ const getAllProducts = async (req, res) => {
 
     try {
         const products = await prisma.product.findMany();
-        res.status(200).json({ "message": products });
+        res.status(200).json({ "allProducts": products });
     }
     catch (err) {
         res.status(500).json({ "Error": err.message });
@@ -31,6 +31,7 @@ const getAllProducts = async (req, res) => {
 
 }
 
+//This part is related to the admin
 const createProduct = async (req, res) => {
     let { name, price, descr } = req.body;
     price = parseInt(price);

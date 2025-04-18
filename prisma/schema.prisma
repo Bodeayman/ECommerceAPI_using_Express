@@ -16,28 +16,59 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Product {
-  id       Int     @id @default(autoincrement())
-  name     String  @db.VarChar(255)
-  price    Int
-  descr    String  @db.VarChar(500)
-  image_url String @db.VarChar(500)
-}
+
 
 model User {
-  id       Int     @id @default(autoincrement())
-  name     String  @db.VarChar(255)
-  password String @db.VarChar(255)
-  email    String  @unique @db.VarChar(500)
-  address String @db.VarChar(255)
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(255)
+  email       String      @unique @db.VarChar(500)
+  password    String      @db.VarChar(255)
+  address     String?      @db.VarChar(255)
+  credit_card String?      @db.VarChar(50)
+  orders      Order[]
+  ratings    Rating[]
 }
-model Review{
-  id       Int     @id @default(autoincrement())
-  user_id_relation User @relation(fields: [user_id], references: [id])
-  product_id_relation Product @relation(fields: [product_id], references: [id])
-  user_id Int 
-  product_id Int
-  rating Decimal
-  comment String @db.VarChar(255)
 
+model Product {
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(255)
+  price       Int
+  descr       String       @db.VarChar(500)
+  image_url   String       @db.VarChar(500)
+  refund      Boolean
+  quantity    Int
+  orderItems  OrderItem[]
+   ratings    Rating[]
+}
+
+model Order {
+  id             Int          @id @default(autoincrement()) // order_id
+  userId         Int
+  user           User         @relation(fields: [userId], references: [id])
+  confirmedDate  DateTime?
+  shippedDate    DateTime?
+  shippingDate   DateTime?
+  deliveryDate   DateTime?
+  location       String       @db.VarChar(255)
+  status         String       @db.VarChar(100)
+  orderItems     OrderItem[]
+}
+
+model OrderItem {
+  order       Order     @relation(fields: [orderId], references: [id])
+  orderId     Int
+  product     Product   @relation(fields: [productId], references: [id])
+  productId   Int
+  quantity    Int
+
+  @@id([orderId, productId])
+}
+model Rating {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String   @db.VarChar(500)
+  userId    Int
+  productId Int
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
 }

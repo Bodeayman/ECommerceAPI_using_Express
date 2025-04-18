@@ -1,0 +1,10 @@
+model Review{
+  id       Int     @id @default(autoincrement())
+  user_id_relation User @relation(fields: [user_id], references: [id])
+  product_id_relation Product @relation(fields: [product_id], references: [id])
+  user_id Int 
+  product_id Int
+  rating Decimal
+  comment String @db.VarChar(255)
+
+}
