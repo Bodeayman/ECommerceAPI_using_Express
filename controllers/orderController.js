@@ -31,18 +31,39 @@ const getAllOrders = async (req, res) => {
 
 
 const createOrder = async (req, res) => {
-    let { name, price, descr } = req.body;
-    price = parseInt(price);
+    let { location, userId, quantity, productId } = req.body;
+
 
     try {
-        const createdProduct = await prisma.product.create({
+        const createdOrder = await prisma.order.create({
             data: {
-                name: name,
-                descr: descr,
-                price: price,
-            }
+                location: location,
+                status: "Running",
+                confirmedDate: new Date(),
+                deliveryDate: new Date(),
+                shippedDate: new Date(),
+                shippingDate: new Date(),
+                user: { connect: { id: parseInt(userId) } }
+            },
+
         });
-        res.status(201).json(createdProduct);
+        const newOrderItem = await prisma.orderItem.create({
+            data: {
+                quantity: parseInt(quantity),
+                product: {
+                    connect: { id: parseInt(productId) }
+                },
+                order: {
+                    connect: { id: createdOrder.id }
+                }
+            }
+        })
+        res.status(201).json({
+            "message": "Created Successfully",
+            "createdOrder": createdOrder,
+            "newOrderItem": newOrderItem
+
+        });
     }
     catch (err) {
         res.status(404).json({ "Error": err.message });

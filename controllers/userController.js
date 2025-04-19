@@ -5,13 +5,14 @@ const User = require('../models/userModel');
 const dotenv = require('dotenv').config();
 const prisma = require('../prisma/prismaClient');
 const registerUser = async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, address } = req.body;
     try {
-        const User = await prisma.User.create({
+        const User = await prisma.user.create({
             data: {
                 name: username,
                 email: email,
-                password: password
+                password: password,
+                address: address,
             }
         });
         res.status(200).json({ "message": "Success", "Registered User": User });
