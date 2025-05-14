@@ -2,17 +2,23 @@
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel');
+const User = require('../Models/userModel');
 const dotenv = require('dotenv').config();
 const prisma = require('../prisma/prismaClient');
 
-const getOrder = async (req, res) => {
+const getAllUserOrders = async (req, res) => {
     try {
-        const order = await prisma.order.findUnique({
+        const orders = await prisma.order.findMany({
             where: {
+                userId:
+                    parseInt(req.params.id)
 
             }
         })
+        if (!orders) {
+            res.status(404).json({ "message": "No orders found for this user" })
+        }
+        res.status(200).json(orders)
     }
     catch (err) {
         res.status(500).json({ message: err.message })
@@ -76,5 +82,5 @@ const createOrder = async (req, res) => {
 
 
 
-module.exports = { getOrder, getAllOrders, createOrder }
+module.exports = { getAllUserOrders, getAllOrders, createOrder }
 //,  deleteOrder

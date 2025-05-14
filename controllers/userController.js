@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel');
+const User = require('../Models/userModel');
 const dotenv = require('dotenv').config();
 const prisma = require('../prisma/prismaClient');
 const registerUser = async (req, res) => {

@@ -1,6 +1,6 @@
 const express = require('express');
-const { getProductRating, giveProductRating } = require('../controllers/ratingController');
-const validateToken = require('../middleware/validateTokenHandler')
+const { getProductRating, giveProductRating } = require('../Controllers/ratingController');
+const validateToken = require('../Middleware/validateTokenHandler')
 
 const router = express.Router();
 

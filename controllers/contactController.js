@@ -3,7 +3,7 @@
 //@access public
 
 const asyncHandler = require('express-async-handler');
-const Contact = require('../models/contactModel');
+const Contact = require('../Models/contactModel');
 
 
 

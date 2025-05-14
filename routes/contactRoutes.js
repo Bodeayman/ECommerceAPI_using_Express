@@ -1,6 +1,6 @@
 const express = require('express');
-const validateToken = require("../middleware/validateTokenHandler");
-const { getContact, createContact, putContact, deleteContact, getSingleContact } = require('../controllers/contactController')
+const validateToken = require("../Middleware/validateTokenHandler");
+const { getContact, createContact, putContact, deleteContact, getSingleContact } = require('../Controllers/contactController')
 // You should define the brackets and the words inside the brackets 
 const router = express.Router();
 

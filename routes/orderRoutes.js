@@ -1,11 +1,11 @@
 const express = require('express');
-const { getOrder, getAllOrders, createOrder } = require('../controllers/orderController');
-const validateToken = require('../middleware/validateTokenHandler')
+const { getAllUserOrders, getAllOrders, createOrder } = require('../Controllers/orderController');
+const validateToken = require('../Middleware/validateTokenHandler')
 
 const router = express.Router();
 
 
-router.get('/:id', getOrder);
+router.get('/:id', getAllUserOrders);
 router.get('/', getAllOrders);
 router.post('/', createOrder)
 //Give him the two function

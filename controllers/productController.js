@@ -2,19 +2,18 @@
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel');
+const User = require('../Models/userModel');
 const dotenv = require('dotenv').config();
 const prisma = require('../prisma/prismaClient');
+const ProductService = require('../Services/productService');
 
+
+
+const productService = new ProductService();
 
 const getProduct = async (req, res) => {
-
-    const product = await prisma.product.findUnique({
-        where: {
-            id: parseInt(req.params.id),
-        }
-
-    });
+    const id = parseInt(req.params.id);
+    const product = await productService.getSpecificProducts(id);
     console.log(product);
     res.status(200).json({ "message": product });
 }
@@ -22,7 +21,7 @@ const getProduct = async (req, res) => {
 const getAllProducts = async (req, res) => {
 
     try {
-        const products = await prisma.product.findMany();
+        const products = await productService.getAllProducts();
         res.status(200).json(products);
     }
     catch (err) {
@@ -33,17 +32,11 @@ const getAllProducts = async (req, res) => {
 
 //This part is related to the admin
 const createProduct = async (req, res) => {
-    let { name, price, descr } = req.body;
+    let { name, price, descr, image_url } = req.body;
     price = parseInt(price);
 
     try {
-        const createdProduct = await prisma.product.create({
-            data: {
-                name: name,
-                descr: descr,
-                price: price,
-            }
-        });
+        const createdProduct = await productService.createNewProduct(name, descr, price, image_url);
         res.status(201).json(createdProduct);
     }
     catch (err) {
@@ -56,12 +49,8 @@ const deleteProduct = async (req, res) => {
     let id = parseInt(req.params.id);
     try {
 
-        const deletedProduct = await prisma.product.delete({
-            where: {
-                id: id
-            }
-        });
-        res.status(200).json({ "message": "Deleted Successfully", "Product Deleted": deletedProduct });
+        const productDeleted = await productService.deleteSpecificProduct(id);
+        res.status(200).json({ "message": "Deleted Successfully", "Product Deleted": productDeleted });
     } catch (err) {
         console.error(err);
         res.status(500).json({ "Error": "Internal Server Error" });
@@ -73,16 +62,7 @@ const updateProduct = async (req, res) => {
     let { name, price, descr } = req.body;
     try {
 
-        const updatedProduct = await prisma.product.update({
-            where: {
-                id: id,
-            }
-            , data: {
-                price: price,
-                descr: descr,
-                name: name
-            }
-        });
+        const updatedProduct = await productService.updateSpecificProduct(id, name, descr, price);
         res.status(200).json({ "Message": "Updated the Product", "Product": updatedProduct });
     } catch (err) {
         console.error(err);
