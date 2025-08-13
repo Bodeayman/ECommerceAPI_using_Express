@@ -2,6 +2,9 @@ const asyncHandler = require('express-async-handler');
 const dotenv = require('dotenv').config();
 const prisma = require('../prisma/prismaClient');
 const { parse, formatISO } = require("date-fns");
+const fs = require('fs');
+const PDFDocument = require('pdfkit');
+const path = require('path');
 
 const getAllSales = async (req, res) => {
     // To get the page
@@ -59,7 +62,68 @@ const getLowStockProducts = async (req, res) => {
     }
 }
 
+const exportProductsInFile = async (req, res) => {
+    try {
+        const products = await prisma.product.findMany({
+            select: { id: true, name: true, price: true, quantity: true }
+        });
+        console.log(products);
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=products.pdf');
+
+        const doc = new PDFDocument();
+        doc.pipe(res);
+
+        // Title
+        doc.fontSize(20).text('Products List', { align: 'center' });
+        doc.moveDown();
+
+        // Simple rows
+        products.forEach(p => {
+            doc.fontSize(12).text(
+                `ID: ${p.id} | Name: ${p.name} | Price: ${p.price} | Quantity: ${p.quantity ?? ''}`
+            );
+        });
+
+        doc.end();
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+const exportSalesInFile = async (req, res) => {
+    try {
+        const sales = await prisma.sale.findMany({
+            select: { id: true, quantity: true, date: true, productId: true }
+        });
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=products.pdf');
+
+        const doc = new PDFDocument();
+        doc.pipe(res);
+
+        // Title
+        doc.fontSize(20).text('Products List', { align: 'center' });
+        doc.moveDown();
+
+        // Simple rows
+        sales.forEach(p => {
+            doc.fontSize(12).text(
+                `ID: ${p.id} | Quantity: ${p.quantity} | Product Id: ${p.productId} | Date: ${p.date ?? ''}`
+            );
+        });
+
+        doc.end();
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
 
 
 
-module.exports = { getLowStockProducts, getAllSales }
+
+module.exports = { getLowStockProducts, getAllSales, exportProductsInFile, exportSalesInFile }

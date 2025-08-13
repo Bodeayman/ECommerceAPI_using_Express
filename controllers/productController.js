@@ -76,38 +76,7 @@ const updateProduct = async (req, res) => {
         return res.status(500).json({ "Error": "Internal Server Error" });
     }
 };
-const exportProductsInFile = async (req, res) => {
-    console.log("hello")
-    try {
-        const products = await prisma.product.findMany({
-            select: { id: true, name: true, price: true, quantity: true }
-        });
-        console.log(products);
-
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=products.pdf');
-
-        const doc = new PDFDocument();
-        doc.pipe(res);
-
-        // Title
-        doc.fontSize(20).text('Products List', { align: 'center' });
-        doc.moveDown();
-
-        // Simple rows
-        products.forEach(p => {
-            doc.fontSize(12).text(
-                `ID: ${p.id} | Name: ${p.name} | Price: ${p.price} | Quantity: ${p.quantity ?? ''}`
-            );
-        });
-
-        doc.end();
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-};
 
 
 
-module.exports = { getProduct, getAllProducts, createProduct, deleteProduct, updateProduct, exportProductsInFile }
+module.exports = { getProduct, getAllProducts, createProduct, deleteProduct, updateProduct, }

@@ -5,7 +5,7 @@ const validateTokenHandler = require('../Middleware/validateTokenHandler');
 const router = express.Router();
 
 
-router.use(validateTokenHandler);
+
 
 
 router.post('/register', registerStaff);

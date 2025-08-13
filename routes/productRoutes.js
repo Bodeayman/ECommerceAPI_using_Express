@@ -1,13 +1,12 @@
 const express = require('express');
-const { getAllProducts, getProduct, createProduct, deleteProduct, updateProduct, exportProductsInFile } = require('../controllers/productController');
+const { getAllProducts, getProduct, createProduct, deleteProduct, updateProduct } = require('../controllers/productController');
 const validateTokenHandler = require('../Middleware/validateTokenHandler');
 
 const router = express.Router();
 
 
 router.use(validateTokenHandler("admin"));
-router.get('/export',
-    exportProductsInFile);
+
 router.get('/', getAllProducts);
 
 router.get('/:id', getProduct);

@@ -9,3 +9,4 @@ function pagination(listOfData, page) {
     return paginatedItems;
 
 }
+module.exports = pagination;

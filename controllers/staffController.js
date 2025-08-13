@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../Models/userModel');
 const dotenv = require('dotenv').config();
 const prisma = require('../prisma/prismaClient');
+const pagination = require("../utils/pagination");
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET
 const registerStaff = async (req, res, next) => {
     const { name, email, password, address, role } = req.body;
@@ -118,7 +119,6 @@ const searchForAProduct = async (req, res) => {
         where: {
             name: {
                 contains: pattern,
-                mode: 'insensitive' // optional: makes it case-insensitive
             }
         }
     })

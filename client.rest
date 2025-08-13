@@ -1,0 +1,2 @@
+curl -X GET "http://localhost:5000/api/reports/exportSales" \
+     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU1MDk3ODY4LCJleHAiOjE3NTUxODQyNjh9.r_LdmUfk58CObSVbioEv60So0YtF7ckP-1CCnHqC3ts"
