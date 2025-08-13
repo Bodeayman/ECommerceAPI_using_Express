@@ -6,7 +6,11 @@ const dotenv = require('dotenv').config();
 const prisma = require('../prisma/prismaClient');
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET
 const registerStaff = async (req, res, next) => {
-    const { username, email, password, address } = req.body;
+    const { username, email, password, address, role } = req.body;
+    const roles = ["admin", "staff"];
+    if (roles.indexOf(role) === -1) {
+        return res.status(404).json({ "message": "Role should be Admin or Staff, Write it correctly" });
+    }
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const User = await prisma.user.create({
@@ -14,10 +18,11 @@ const registerStaff = async (req, res, next) => {
                 name: username,
                 email: email,
                 password: hashedPassword,
-                address: address
+                address: address,
+                role: role
             }
         });
-        res.status(200).json({ "Status": "Your signed in successfully" });
+        res.status(200).json({ "Status": `Your signed in successfully as ${role}` });
     }
     catch (err) {
         next(err);
@@ -76,17 +81,29 @@ const loginStaff = async (req, res, next) => {
         if (!isPasswordValid) {
             return res.status(404).json({ message: "Wrong email or password" });
         }
+        if (user.role === "admin") {
+            const token = jwt.sign({ id: user.id, role: user.role }, ACCESS_TOKEN_SECRET, { expiresIn: "1d" });
+            console.log("ACCESS_TOKEN_SECRET:", ACCESS_TOKEN_SECRET);
 
-        const token = jwt.sign({ id: user.id }, ACCESS_TOKEN_SECRET, { expiresIn: "1d" });
-        console.log("ACCESS_TOKEN_SECRET:", ACCESS_TOKEN_SECRET);
 
+            return res.status(200).json({
+                status: "Success",
+                role: "Admin",
+                token: token
+            });
+        }
+        else {
+            const token = jwt.sign({ id: user.id, role: user.role }, ACCESS_TOKEN_SECRET, { expiresIn: "1d" });
+            console.log("Access token is", token);
+            return res.status(200).json({
+                status: "Success",
+                role: "Staff",
+                token: token
+            });
+        }
 
-        return res.status(200).json({
-            status: "Success",
-            token: token
-        });
     } catch (err) {
-        next(err)
+        return res.status(500).json({ message: "Internal server error", err: err });
     }
 };
 

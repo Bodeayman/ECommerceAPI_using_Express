@@ -23,7 +23,7 @@ model User {
   email       String      @unique @db.VarChar(500)
   password    String      @db.VarChar(255)
   address     String?      @db.VarChar(255)
-  credit_card String?      @db.VarChar(50)
+  role         String?     @db.VarChar(255)
   orders      Order[]
   ratings    Rating[]
 }
