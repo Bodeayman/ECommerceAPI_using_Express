@@ -4,56 +4,93 @@ const jwt = require('jsonwebtoken');
 const User = require('../Models/userModel');
 const dotenv = require('dotenv').config();
 const prisma = require('../prisma/prismaClient');
-const registerUser = async (req, res) => {
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET
+const registerUser = async (req, res, next) => {
     const { username, email, password, address } = req.body;
     try {
+        const hashedPassword = await bcrypt.hash(password, 10);
         const User = await prisma.user.create({
             data: {
                 name: username,
                 email: email,
-                password: password,
-                address: address,
+                password: hashedPassword,
+                address: address
             }
         });
-        res.status(200).json({ "message": "Success", "Registered User": User });
+        res.status(200).json({ "Status": "Your signed in successfully" });
     }
     catch (err) {
-        res.status(500).json({ "Message": err.message });
+        next(err);
     }
 
 };
 
 const currentUser = asyncHandler(async (req, res) => {
-
-});
-
-const loginUser = async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        res.status(400).json({ "Message": "All fields are mandatory" });
-
-    }
-    try {
-        const user = await prisma.User.findUnique({
-            where: {
-                email: email,
-                password: password
-            }
-        })
-        if (!user) {
-            res.status(404).json({ "Message": "Wrong username or password" });
+    const user = await prisma.user.findUnique({
+        where: {
+            id: req.user.id
         }
-        res.status(200).json({ "Message": "Login successful" });
+    });
+    res.status(200).json(user);
+});
+const updateProfile = asyncHandler(async (req, res) => {
+    const { email, name, address } = req.body;
+    try {
+        const user = await prisma.user.update({
+            where: {
+                id: req.user.id
+            },
+            data: {
+                email: email,
+                name: name,
+                address: address
+            }
+        });
+        res.status(200).json(user);
+    } catch (err) {
+        next(err);
     }
-    catch (err) {
-        res.status(500).json({ "Message": err.message });
+});
+const loginUser = async (req, res, next) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ message: "All fields are mandatory" });
     }
 
+    try {
+        console.log("Attempting login for user:", email);
+        console.log(password);
+        const user = await prisma.user.findFirst({
+            where: {
+                email: email
+            }
+        });
+        console.log(user);
+        if (!user) {
+            return res.status(404).json({ message: "Wrong email or password" });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+            return res.status(404).json({ message: "Wrong email or password" });
+        }
+
+        const token = jwt.sign({ id: user.id }, ACCESS_TOKEN_SECRET, { expiresIn: "1d" });
+        console.log("ACCESS_TOKEN_SECRET:", ACCESS_TOKEN_SECRET);
 
 
-}
+        return res.status(200).json({
+            status: "Success",
+            token: token
+        });
+    } catch (err) {
+        next(err)
+    }
+};
 
-module.exports = { registerUser, currentUser, loginUser };
+module.exports = { registerUser, currentUser, loginUser, updateProfile };
 
 
 // if (user && (await bcrypt.compare(password, user.password))) {

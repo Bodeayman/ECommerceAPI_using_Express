@@ -1,26 +1,25 @@
-const asyncHandler = require('express-async-handler');
 const jwt = require("jsonwebtoken");
-require('dotenv').config();
+require("dotenv").config();
+const validateTokenHandler = (req, res, next) => {
+    const authHeader = req.headers.authorization;
 
-
-const validateToken = asyncHandler(async (req, res, next) => {
-    let token;
-    let authHeader = req.headers.Authorization || req.headers.authorization;
-    if (authHeader && authHeader.startsWith("Bearer")) {
-        token = authHeader.split(" ")[1];
-        jwt.verify(token.process.env.SECRET_KEY, (err, decoded) => {
-            if (err) {
-                res.status(401);
-                throw new Error("User is not authorized");
-            }
-            req.user = decoded.user;
-            next();
-        });
-        if (!token) {
-            res.status(401);
-            throw new Error("User is not authorized");
-        }
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        res.status(401);
+        return next(new Error("Invalid token"));
     }
-});
 
-module.exports = validateToken;
+    const token = authHeader.split(" ")[1];
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+            res.status(401);
+            return next(new Error("The user is not authorized"));
+        }
+
+        req.user = decoded; // هنا كان الخطأ
+        next();
+    });
+};
+
+
+module.exports = validateTokenHandler;

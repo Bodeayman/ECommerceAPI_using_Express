@@ -2,37 +2,47 @@ const prisma = require('../prisma/prismaClient');
 
 class ProductService {
     getAllProducts() {
-        return prisma.product.findMany();
+        return prisma.product.findMany({
+            select: {
+                id: true,
+                name: true,
+                descr: true,
+                price: true,
+                image_url: true,
+                refund: true,
+                quantity: true
+            }
+        });
     }
-    createNewProduct(name, desc, price, image) {
+    createNewProduct(name, desc, price, image, quantity) {
         return prisma.product.create({
             data: {
                 name: name,
                 descr: desc,
                 price: price,
-                image_url: image,
-                refund: true,
-                quantity: 1
+                image_url: image ?? "https://placeholder.img",
+                refund: true ?? true,
+                quantity: quantity ?? 0,
             }
         });
     }
 
     getSpecificProducts(id) {
-        return prisma.product.findUnique({
+        prisma.product.findUnique({
             where: {
                 id: parseInt(id),
             }
         });
     }
     deleteSpecificProduct(id) {
-        return prisma.product.delete({
+        prisma.product.delete({
             where: {
-                id: id
+                id: parseInt(id)
             }
         });
     }
     updateSpecificProduct(id, name, descr, price) {
-        return prisma.product.update({
+        prisma.product.update({
             where: {
                 id: id,
             }

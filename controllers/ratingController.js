@@ -16,12 +16,12 @@ const getProductRating = async (req, res) => {
                 user: true
             }
         });
-        if (!productRating) {
+        if (productRating.length === 0) {
             return res.status(404).json({ message: 'Rating not found for the given productId' });
         }
-        res.status(200).json(productRating);
+        return res.status(200).json(productRating);
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        return res.status(500).json({ message: 'Server error', error: error.message });
     }
 }
 
@@ -48,6 +48,7 @@ const giveProductRating = async (req, res) => {
         res.status(200).json({ message: "Rating Created Successfully", createdRating: giveRating });
     }
     catch (e) {
+
         res.status(500).json({ "Server message": e.message })
     }
 }
