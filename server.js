@@ -16,7 +16,7 @@ app.use(express.json());
 // app.use(validateTokenHandler);
 
 
-app.use('/api/users', require("./Routes/userRoutes"));
+app.use('/api/staffs', require("./Routes/staffRoutes"));
 app.use('/api/contacts', require("./Routes/contactRoutes"));
 
 app.use('/api/products', require('./routes/productRoutes'));

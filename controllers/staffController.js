@@ -5,7 +5,7 @@ const User = require('../Models/userModel');
 const dotenv = require('dotenv').config();
 const prisma = require('../prisma/prismaClient');
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET
-const registerUser = async (req, res, next) => {
+const registerStaff = async (req, res, next) => {
     const { username, email, password, address } = req.body;
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -25,7 +25,7 @@ const registerUser = async (req, res, next) => {
 
 };
 
-const currentUser = asyncHandler(async (req, res) => {
+const currentStaff = asyncHandler(async (req, res) => {
     const user = await prisma.user.findUnique({
         where: {
             id: req.user.id
@@ -51,7 +51,7 @@ const updateProfile = asyncHandler(async (req, res) => {
         next(err);
     }
 });
-const loginUser = async (req, res, next) => {
+const loginStaff = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -90,7 +90,7 @@ const loginUser = async (req, res, next) => {
     }
 };
 
-module.exports = { registerUser, currentUser, loginUser, updateProfile };
+module.exports = { registerStaff, currentStaff, loginStaff, updateProfile };
 
 
 // if (user && (await bcrypt.compare(password, user.password))) {
