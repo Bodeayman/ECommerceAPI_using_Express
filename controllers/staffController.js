@@ -6,7 +6,7 @@ const dotenv = require('dotenv').config();
 const prisma = require('../prisma/prismaClient');
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET
 const registerStaff = async (req, res, next) => {
-    const { username, email, password, address, role } = req.body;
+    const { name, email, password, address, role } = req.body;
     const roles = ["admin", "staff"];
     if (roles.indexOf(role) === -1) {
         return res.status(404).json({ "message": "Role should be Admin or Staff, Write it correctly" });
@@ -15,7 +15,7 @@ const registerStaff = async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const User = await prisma.user.create({
             data: {
-                name: username,
+                name: name,
                 email: email,
                 password: hashedPassword,
                 address: address,

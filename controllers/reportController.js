@@ -4,12 +4,28 @@ const prisma = require('../prisma/prismaClient');
 const { parse, formatISO } = require("date-fns");
 
 const getAllSales = async (req, res) => {
+    // To get the page
+    let page = 1;
+    if (req.query.page > 0) {
+        page = req.query.page;
+    }
+    parseInt(req.query.page);
+    if (page <= 0) { // Still page is not working because of the null
+        page = 1
+    }
+    // To Get the date
+
     const { date } = req.body
+    if (date == null) {
+        return res.status(403).json({ "message": "Please import the date" })
+    }
     const newDate = parse(date, "yyyy-MM-dd", new Date());
     const startOfDay = new Date(newDate);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(newDate);
     endOfDay.setHours(23, 59, 59, 999);
+
+
     try {
 
         const allSales = await prisma.sale.findMany({
@@ -23,7 +39,10 @@ const getAllSales = async (req, res) => {
         if (allSales.length === 0) {
             return res.status(200).json({ "message": "No stocks found in this day" })
         }
-        res.status(200).json(allSales);
+        // This should be the pagination part
+        // Have problem with the pagination
+        const paginatedSales = allSales.slice((page * 10) - 10, (page * 10))
+        res.status(200).json(paginatedSales);
     }
     catch (err) {
         res.status(404).json({ err: err.message });
