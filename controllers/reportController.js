@@ -7,12 +7,9 @@ const getAllSales = async (req, res) => {
     // To get the page
     let page = 1;
     if (req.query.page > 0) {
-        page = req.query.page;
+        page = parseInt(req.query.page);
     }
-    parseInt(req.query.page);
-    if (page <= 0) { // Still page is not working because of the null
-        page = 1
-    }
+
     // To Get the date
 
     const { date } = req.body
@@ -39,9 +36,7 @@ const getAllSales = async (req, res) => {
         if (allSales.length === 0) {
             return res.status(200).json({ "message": "No stocks found in this day" })
         }
-        // This should be the pagination part
-        // Have problem with the pagination
-        const paginatedSales = allSales.slice((page * 10) - 10, (page * 10))
+        const paginatedSales = pagination(allSales, page);
         res.status(200).json(paginatedSales);
     }
     catch (err) {

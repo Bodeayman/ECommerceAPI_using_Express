@@ -107,7 +107,30 @@ const loginStaff = async (req, res, next) => {
     }
 };
 
-module.exports = { registerStaff, currentStaff, loginStaff, updateProfile };
+const searchForAProduct = async (req, res) => {
+    console.log("Working");
+    const { pattern } = req.body
+    let page = 1;
+    if (req.query.page > 0) {
+        page = parseInt(req.query.page);
+    }
+    const productsFollow = await prisma.product.findMany({
+        where: {
+            name: {
+                contains: pattern,
+                mode: 'insensitive' // optional: makes it case-insensitive
+            }
+        }
+    })
+    console.log(productsFollow);
+    if (productsFollow.length <= 0) {
+        return res.status(200).json({ "message": "No products follow the same pattern" });
+    }
+    const paginatedProduct = pagination(productsFollow, page);
+    res.status(200).json(paginatedProduct)
+}
+
+module.exports = { registerStaff, currentStaff, loginStaff, updateProfile, searchForAProduct };
 
 
 // if (user && (await bcrypt.compare(password, user.password))) {
