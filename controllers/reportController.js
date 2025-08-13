@@ -1,17 +1,32 @@
 const asyncHandler = require('express-async-handler');
 const dotenv = require('dotenv').config();
 const prisma = require('../prisma/prismaClient');
+const { parse, formatISO } = require("date-fns");
 
 const getAllSales = async (req, res) => {
+    const { date } = req.body
+    const newDate = parse(date, "yyyy-MM-dd", new Date());
+    const startOfDay = new Date(newDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(newDate);
+    endOfDay.setHours(23, 59, 59, 999);
     try {
-        const allSales = await prisma.sale.findMany();
+
+        const allSales = await prisma.sale.findMany({
+            where: {
+                date: {
+                    gte: startOfDay,
+                    lte: endOfDay
+                }
+            }
+        });
         if (allSales.length === 0) {
-            return res.status(200).json({ "message": "No stocks left in this product" })
+            return res.status(200).json({ "message": "No stocks found in this day" })
         }
         res.status(200).json(allSales);
     }
     catch (err) {
-        res.status(404).json({ err: err });
+        res.status(404).json({ err: err.message });
     }
 }
 

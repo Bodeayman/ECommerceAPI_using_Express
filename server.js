@@ -24,6 +24,7 @@ app.use('/api/orders', require('./Routes/orderRoutes'));
 app.use('/api/ratings', require('./Routes/ratingRoutes'));
 app.use('/api/stocks', require('./Routes/stockRoutes'));
 app.use('/api/reports', require('./Routes/reportRoutes'))
+app.use('/api/sales', require('./Routes/saleRoutes'));
 
 
 
