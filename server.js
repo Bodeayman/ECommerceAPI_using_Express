@@ -21,7 +21,10 @@ app.use('/api/contacts', require("./Routes/contactRoutes"));
 
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/orders', require('./Routes/orderRoutes'));
-app.use('/api/rating', require('./Routes/ratingRoutes'));
+app.use('/api/ratings', require('./Routes/ratingRoutes'));
+app.use('/api/stocks', require('./Routes/stockRoutes'));
+app.use('/api/reports', require('./Routes/reportRoutes'))
+
 
 
 // app.use(errorHandler);

@@ -33,11 +33,10 @@ model Product {
   name        String       @db.VarChar(255)
   price       Int
   descr       String       @db.VarChar(500)
-  image_url   String?       @db.VarChar(500)
-  refund      Boolean?
   quantity    Int?
   orderItems  OrderItem[]
    ratings    Rating[]
+   sales Sale[]
 }
 
 model Order {
@@ -51,6 +50,15 @@ model Order {
   location       String       @db.VarChar(255)
   status         String       @db.VarChar(100)
   orderItems     OrderItem[]
+}
+
+model Sale{
+  id Int      @id @default(autoincrement())
+    quantity Int
+    date DateTime
+    productId Int
+    product   Product  @relation(fields: [productId], references: [id])
+
 }
 
 model OrderItem {
