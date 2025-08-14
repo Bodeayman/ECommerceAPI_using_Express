@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getLowStockProducts, getAllSales, exportProductsInFile, exportSalesInFile } = require('../Controllers/reportController')
-const validateTokenHandler = require('../Middleware/validateTokenHandler');
+const { validateTokenHandler } = require('../Middleware/validateTokenHandler');
 
 
 router.use(validateTokenHandler("admin"));

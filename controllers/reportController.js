@@ -65,7 +65,8 @@ const getLowStockProducts = async (req, res) => {
 const exportProductsInFile = async (req, res) => {
     try {
         const products = await prisma.product.findMany({
-            select: { id: true, name: true, price: true, quantity: true }
+            select: { id: true, name: true, price: true, quantity: true },
+
         });
         console.log(products);
 
@@ -94,9 +95,21 @@ const exportProductsInFile = async (req, res) => {
 };
 
 const exportSalesInFile = async (req, res) => {
+    const { startDate, endDate } = req.body;
+    const newDate = parse(date, "yyyy-MM-dd", new Date());
+    const startOfDay = new Date(newDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(newDate);
+    endOfDay.setHours(23, 59, 59, 999);
     try {
         const sales = await prisma.sale.findMany({
-            select: { id: true, quantity: true, date: true, productId: true }
+            select: { id: true, quantity: true, date: true, productId: true },
+            where: {
+                date: {
+                    gte: startOfDay,
+                    lte: endOfDay
+                }
+            }
         });
 
         res.setHeader('Content-Type', 'application/pdf');

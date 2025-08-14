@@ -6,6 +6,7 @@ const dotenv = require('dotenv').config();
 const prisma = require('../prisma/prismaClient');
 const pagination = require("../utils/pagination");
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 const registerStaff = async (req, res, next) => {
     const { name, email, password, address, role } = req.body;
     const roles = ["admin", "staff"];
@@ -82,32 +83,29 @@ const loginStaff = async (req, res, next) => {
         if (!isPasswordValid) {
             return res.status(404).json({ message: "Wrong email or password" });
         }
-        if (user.role === "admin") {
-            const token = jwt.sign({ id: user.id, role: user.role }, ACCESS_TOKEN_SECRET, { expiresIn: "1d" });
-            console.log("ACCESS_TOKEN_SECRET:", ACCESS_TOKEN_SECRET);
+        const token = jwt.sign({ id: user.id, role: user.role }, ACCESS_TOKEN_SECRET, { expiresIn: "30m" });
 
+        const refreshToken = jwt.sign({ id: user.id, role: user.role }, REFRESH_TOKEN_SECRET, { expiresIn: "3d" });
 
-            return res.status(200).json({
-                status: "Success",
-                role: "Admin",
-                token: token
-            });
-        }
-        else {
-            const token = jwt.sign({ id: user.id, role: user.role }, ACCESS_TOKEN_SECRET, { expiresIn: "1d" });
-            console.log("Access token is", token);
-            return res.status(200).json({
-                status: "Success",
-                role: "Staff",
-                token: token
-            });
-        }
+        return res.status(200).json({
+            status: "Success",
+            role: (user.role === "admin" ? "Admin" : "Staff"),
+            token: token,
+            refreshToken: refreshToken
+        });
 
     } catch (err) {
         return res.status(500).json({ message: "Internal server error", err: err });
     }
 };
-
+const refreshToken = async (req, res) => {
+    console.log("Refreshing");
+    const user = prisma.user.findMany({
+        where: { id: req.user.id }
+    })
+    const token = jwt.sign({ id: user.id, role: user.role }, ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+    res.status(200).json({ "message": "Token is refreshed Successfully", "token": token });
+}
 const searchForAProduct = async (req, res) => {
     console.log("Working");
     const { pattern } = req.body
@@ -130,7 +128,7 @@ const searchForAProduct = async (req, res) => {
     res.status(200).json(paginatedProduct)
 }
 
-module.exports = { registerStaff, currentStaff, loginStaff, updateProfile, searchForAProduct };
+module.exports = { registerStaff, currentStaff, loginStaff, updateProfile, searchForAProduct, refreshToken };
 
 
 // if (user && (await bcrypt.compare(password, user.password))) {

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { buyAProduct } = require('../Controllers/saleController')
-const validateTokenHandler = require('../Middleware/validateTokenHandler');
+const { validateTokenHandler } = require('../Middleware/validateTokenHandler');
 
 
 router.use(validateTokenHandler("staff"));

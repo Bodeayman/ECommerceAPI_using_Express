@@ -22,11 +22,11 @@ const getProduct = async (req, res) => {
 const getAllProducts = async (req, res) => {
 
     try {
-        const products = await productService.getAllProducts();
+        const products = await prisma.product.findMany({});
         return res.status(200).json(products);
     }
     catch (err) {
-        return res.status(500).json({ "Error": err.message });
+        return res.status(500).json({ "Error": err });
     }
 
 }
