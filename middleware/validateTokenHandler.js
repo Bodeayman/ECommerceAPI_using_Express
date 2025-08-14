@@ -6,8 +6,7 @@ const validateTokenHandler = (requiredRole) => {
             const authHeader = req.headers.authorization;
 
             if (!authHeader || !authHeader.startsWith("Bearer ")) {
-                res.status(401);
-                return next(new Error("Invalid token"));
+                return res.status(401).json({ "message": "Make sure to put a valid token" });
             }
 
             const token = authHeader.split(" ")[1];
@@ -16,15 +15,14 @@ const validateTokenHandler = (requiredRole) => {
                 req.user = decoded;
 
                 if (requiredRole && decoded.role !== requiredRole) {
-                    res.status(403).json({ "message": "Insufficient Role" });
+                    return res.status(403).json({ "message": "Insufficient Role" });
                 }
 
                 next();
             });
         }
         catch (err) {
-            res.status(500).json({ err: err.message })
-            //Remember that you will need the err message in your job
+            return res.status(500).json({ err: err.message })
         }
 
     }
@@ -36,8 +34,7 @@ const RefreshTokenHandler = (requiredRole) => {
             const authHeader = req.headers.authorization;
 
             if (!authHeader || !authHeader.startsWith("Bearer ")) {
-                res.status(401).json({ "message": "Insert the token correctly" });
-                next();
+                return res.status(401).json({ "message": "Insert the token correctly" });
             }
             const token = authHeader.split(" ")[1];
 
@@ -45,15 +42,14 @@ const RefreshTokenHandler = (requiredRole) => {
                 req.user = decoded;
 
                 if (requiredRole && decoded.role !== requiredRole) {
-                    res.status(403).json({ "message": "Insufficient Role" });
+                    return res.status(403).json({ "message": "Insufficient Role" });
                 }
 
                 next();
             });
         }
         catch (err) {
-            res.status(500).json({ err: err })
-            next();
+            return res.status(500).json({ err: err })
         }
     }
 };

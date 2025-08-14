@@ -2,12 +2,15 @@ const asyncHandler = require('express-async-handler');
 const dotenv = require('dotenv').config();
 const prisma = require('../prisma/prismaClient');
 const { parse, formatISO } = require("date-fns");
+const pagination = require('../Utils/pagination');
 const fs = require('fs');
 const PDFDocument = require('pdfkit');
 const path = require('path');
 
 const getAllSales = async (req, res) => {
     // To get the page
+    console.log(req.body);
+
     let page = 1;
     if (req.query.page > 0) {
         page = parseInt(req.query.page);
@@ -15,8 +18,9 @@ const getAllSales = async (req, res) => {
 
     // To Get the date
 
-    const { date } = req.body
-    if (date == null) {
+    const { date } = req.body;
+    console.log(req.body);
+    if (!date) {
         return res.status(403).json({ "message": "Please import the date" })
     }
     const newDate = parse(date, "yyyy-MM-dd", new Date());

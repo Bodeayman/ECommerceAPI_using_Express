@@ -9,11 +9,11 @@ const router = express.Router();
 
 
 router.post('/register', registerStaff);
-router.get('/search', validateTokenHandler, searchForAProduct)
+router.get('/search', validateTokenHandler(), searchForAProduct)
 router.post('/login', loginStaff);
-router.get('/current', validateTokenHandler, currentStaff);
-router.put('/update', validateTokenHandler, updateProfile);
-router.post('/refresh', RefreshTokenHandler, refreshToken);
+router.get('/current', validateTokenHandler(), currentStaff);
+router.put('/update', validateTokenHandler(), updateProfile);
+router.post('/refresh', RefreshTokenHandler(), refreshToken);
 //Give him the two function
 
 module.exports = router;
