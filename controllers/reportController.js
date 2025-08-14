@@ -20,6 +20,7 @@ const getAllSales = async (req, res) => {
 
     const { date } = req.body;
     console.log(req.body);
+    // To check that this variable is not found inside the date
     if (!date) {
         return res.status(403).json({ "message": "Please import the date" })
     }

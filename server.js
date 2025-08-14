@@ -5,15 +5,15 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./Docs/swagger-output.json"); // Auto-generated
 const errorHandler = require('./Middleware/errorhandler');
 const validateTokenHandler = require('./Middleware/validateTokenHandler');
-
+const limiter = require('./Middleware/rateLimiter');
 const pgConnection = require('./config/pgConnection');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// app.use(validateTokenHandler);
+
+app.use(limiter);
 
 
 app.use('/api/staffs', require("./Routes/staffRoutes"));
